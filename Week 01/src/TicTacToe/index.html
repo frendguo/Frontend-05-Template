@@ -72,6 +72,10 @@
             current = 3 - current;
 
             show();
+
+            if (willWin(parttern, current)){
+                console.log(`${current === 1 ? "X" : "O"} will be Winner!!!`)
+            }
         }
         /// TODO:待优化
         function isWin(part, color) {
@@ -125,6 +129,27 @@
             return false;
         }
 
+        function clone(obj) {
+            return JSON.parse(JSON.stringify(obj));
+        }
+
+        function willWin(part, color) {
+            let newPart = clone(part);
+            for (let i = 0; i < row; i++){
+                for (let j = 0; j < col; j++) {
+                    if (!newPart[i][j]) {
+                        newPart[i][j] = color;
+                        if (isWin(newPart, color)){
+                            return true;
+                        }
+
+                        newPart[i][j] = 0;
+                    }
+                }
+            }
+
+            return false;
+        }
         show();
     </script>
 </body>
