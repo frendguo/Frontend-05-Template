@@ -17,25 +17,23 @@
     <div id="light"></div>
 
     <script>
-        function setLight(time, color){
-            return new Promise((solve, reject) => {  
-                setTimeout(() => {
-                    let light = document.getElementById("light");
-                    light.style.backgroundColor = color;
-                    solve();
-                }, time);
-            })
+        function setLight(color){
+            let light = document.getElementById("light");
+            light.style.backgroundColor = color;
         }
 
-        async function main(){
-            await setLight(10 * 1000, "yellow");
-            await setLight(2 * 1000, "red");
-            await setLight(5 * 1000, "green")
+        function sleep(t) {
+            return new Promise((solve) => { setTimeout(solve, t)});
         }
-        while(true){
-            main();
+
+        async function go(){
+            await sleep(10 * 1000);
+            setLight("yellow");
+            await sleep(2 * 1000);
+            setLight("red");
+            await sleep(5 * 1000);
+            setLight("green")
         }
-        
     </script>
 </body>
 </html>
