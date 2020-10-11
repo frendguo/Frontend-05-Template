@@ -73,10 +73,27 @@
 
             show();
 
-            if (willWin(parttern, current)){
-                console.log(`${current === 1 ? "X" : "O"} will be Winner!!!`)
-            }
+            nextMove();
         }
+
+        function nextMove()
+        {
+            let choice = bestChoice(parttern, current);
+            if (choice.point) {
+                const x = choice.point[0];
+                const y = choice.point[1];
+                parttern[x][y] = current;
+            }
+
+            if (isWin(parttern, current)){
+                alert(`${current === 1 ? "X" : "O"} Winner!!!`)
+            }
+
+            current = 3 - current;
+
+            show();
+        }
+
         /// TODO:待优化
         function isWin(part, color) {
             for (let i = 0; i < row; i++){
@@ -140,16 +157,53 @@
                     if (!newPart[i][j]) {
                         newPart[i][j] = color;
                         if (isWin(newPart, color)){
-                            return true;
+                            return [i, j];
                         }
 
                         newPart[i][j] = 0;
                     }
                 }
             }
-
-            return false;
+            return null;
         }
+
+        function bestChoice(part, color) {
+            let p = null;
+            if (p = isWin(part, color)){
+                return {
+                    result: 1,
+                    point: p,
+                }
+            }
+            
+            let result = -2;
+            
+            outer: for (let i = 0; i < row; i++) {
+                for (let j = 0; j < col; j++) {
+                    let tmp = clone(part);
+                    if (tmp[i][j]){
+                        continue;
+                    }
+                    tmp[i][j] = color;
+                    // 自己走完了，判断对方的
+                    let r = bestChoice(tmp, 3 - color).result;
+                    if (-r > result) {
+                        p = [i, j];
+                        result = -r;
+                    }
+
+                    if (result == 1) {
+                        break outer;
+                    }
+                }
+            }
+
+            return {
+                point: p,
+                result: p ? result : 0,
+            }
+        }
+
         show();
     </script>
 </body>
