@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TicTacToe</title>
+    <style>
+        .cell {
+            background-color: #14bdac;
+            border: 1px solid white;
+            width: 100px;
+            height: 100px;
+            display: inline-block;
+
+            vertical-align: middle;
+            line-height: 100px;
+            text-align: center;
+            font-size: 50px;
+        }
+
+        #board {
+            width: 350px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="board"></div>
+
+    <script>
+        let parttern = [
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0],
+        ]
+
+        const row = 3;
+        const col = 3;
+
+        // X 先走
+        let current = 1;
+
+        function show() {
+            let board = document.getElementById("board");
+            board.innerHTML = "";
+            for (let i = 0; i < row; i++) {
+                for (let j = 0; j < col; j++) {
+                    let cell = document.createElement("div");
+
+                    cell.innerText = parttern[i][j] === 1 ? "X" :
+                        parttern[i][j] == 2 ? "O" : "";
+
+                    cell.classList.add("cell");
+
+                    cell.addEventListener("click", () => move(i, j))
+                    board.appendChild(cell);
+                }
+            }
+        }
+
+        function move(x, y) {
+            if (parttern[x][y] !== 0) {
+                return;
+            }
+
+            parttern[x][y] = current;
+            if (isWin(parttern, current)){
+                alert(`${current === 1 ? "X" : "O"} Winner!!!`)
+            }
+
+            current = 3 - current;
+
+            show();
+        }
+        /// TODO:待优化
+        function isWin(part, color) {
+            for (let i = 0; i < row; i++){
+                let j = 0;
+                for (; j < col; j++) {
+                    if (part[i][j] !== color){
+                        break;
+                    }
+                }
+                if (j >= col) {
+                    return true;
+                }
+            }
+
+            for (let i = 0; i < col; i++){
+                let j = 0;
+                for (; j < row; j++) {
+                    if (part[j][i] !== color){
+                        break;
+                    }
+                }
+                if (j >= row) {
+                    return true;
+                }
+            }
+            {
+                let i = 0;
+                for (; i < row; i++) {
+                    if (part[i][i] !== color){
+                        break;
+                    }
+                }
+                if (i >= row){
+                    return true;
+                }
+            }
+
+            {
+                let i = 0;
+                for (; i < row; i++) {
+                    if (part[i][col - 1 - i] !== color){
+                        break;
+                    }
+                }
+                if (i >= row){
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        show();
+    </script>
+</body>
+
+</html>
