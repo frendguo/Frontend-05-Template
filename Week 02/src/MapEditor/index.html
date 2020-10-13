@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地图</title>
+</head>
+
+<body>
+    <style>
+        .cell {
+            width: 6px;
+            height: 6px;
+            line-height: 7px;
+            display: inline-block;
+            background-color: gray;
+            vertical-align: top;
+
+            border-right: 1px solid white;
+            border-bottom: 1px solid white;
+        }
+
+        #container {
+            width: 701px;
+        }
+    </style>
+
+    <div id="container"></div>
+
+    <button>save</button>
+
+
+    <script>
+        var map = new Array(100 * 100).fill(0);
+
+        function showMap() {
+            let container = document.getElementById("container");
+            for (let i = 0; i < map.length; i++) {
+                let cell = document.createElement("div");
+                cell.classList.add("cell");
+
+                container.appendChild(cell);
+            }
+        }
+
+        showMap();
+    </script>
+</body>
+
+</html>
