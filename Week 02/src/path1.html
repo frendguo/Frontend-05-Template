@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地图</title>
+</head>
+
+<body>
+    <style>
+        .cell {
+            width: 6px;
+            height: 6px;
+            display: inline-block;
+            background-color: gray;
+            vertical-align: top;
+
+            border-right: 1px solid white;
+            border-bottom: 1px solid white;
+        }
+
+        #container {
+            width: 701px;
+            line-height: 0;
+        }
+    </style>
+
+    <div id="container"></div>
+
+    <button onclick="save()">save</button>
+
+    <script>
+        var map = localStorage['map'] ? JSON.parse(localStorage['map']) : new Array(100 * 100).fill(0);
+        var isMouseDown = false;
+        var isClear = false;
+
+        function save() {
+            localStorage['map'] = JSON.stringify(map);
+        }
+
+        function path(map, start, end){
+            let queue = [start];
+
+            function insert(x, y){
+                if (x < 0 || x >= 100 || y < 0 || y >= 100){
+                    return;
+                }
+
+                if (map[x * 100 + y]){
+                    return;
+                }
+
+                queue.push([x, y]);
+                map[x * 100 + y] = 2;
+            }
+
+            while(queue.length) {
+                
+                let [x, y] = queue.shift();
+                console.log(`x:${x}, y:${y}`);
+
+                if (x === end[0] && y === end[1]){
+                    return true;
+                }
+
+                insert(x + 1, y);
+                insert(x - 1, y);
+                insert(x, y + 1);
+                insert(x, y - 1);
+            }
+
+            return false;
+        }
+
+        let container = document.getElementById("container");
+        for (let i = 0; i < map.length; i++) {
+            let cell = document.createElement("div");
+            cell.classList.add("cell");
+            cell.addEventListener("mousemove", (e)=>{
+                if (isMouseDown) {
+                    if (isClear){
+                        cell.style.backgroundColor = "gray";
+                    } else {
+                        cell.style.backgroundColor = "black";
+                        map[i] = 1;
+                    }
+                }
+            });
+
+            if (map[i] === 0){
+                cell.style.backgroundColor = "gray";
+            } else {
+                cell.style.backgroundColor = "black";
+            }
+
+            container.appendChild(cell);
+        }
+
+        container.onmousedown = (e) => {
+            isMouseDown = true;
+            isClear = e.buttons === 2;
+        }
+        container.onmouseup = () => isMouseDown = false;
+        container.oncontextmenu = (e) => e.preventDefault();
+    </script>
+</body>
+
+</html>
