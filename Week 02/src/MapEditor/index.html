@@ -28,22 +28,43 @@
 
     <div id="container"></div>
 
-    <button>save</button>
+    <button onclick="save()">save</button>
 
     <script>
-        var map = new Array(100 * 100).fill(0);
+        var map = localStorage['map'] ? JSON.parse(localStorage['map']) : new Array(100 * 100).fill(0);
+        var isMouseDown = false;
 
-        function showMap() {
-            let container = document.getElementById("container");
-            for (let i = 0; i < map.length; i++) {
-                let cell = document.createElement("div");
-                cell.classList.add("cell");
-
-                container.appendChild(cell);
-            }
+        function save() {
+            localStorage['map'] = JSON.stringify(map);
         }
 
-        showMap();
+        let container = document.getElementById("container");
+        for (let i = 0; i < map.length; i++) {
+            let cell = document.createElement("div");
+            cell.classList.add("cell");
+            cell.addEventListener("mousemove", (e)=>{
+                if (isMouseDown) {
+                    if (e.buttons === 2){
+                        cell.style.backgroundColor = "gray";
+                    } else {
+                        cell.style.backgroundColor = "black";
+                        map[i] = 1;
+                    }
+                }
+            });
+
+            if (map[i] === 0){
+                cell.style.backgroundColor = "gray";
+            } else {
+                cell.style.backgroundColor = "black";
+            }
+
+            container.appendChild(cell);
+        }
+
+        container.onmousedown = () => isMouseDown = true;
+        container.onmouseup = () => isMouseDown = false;
+        container.oncontextmenu = (e) => e.preventDefault();
     </script>
 </body>
 
