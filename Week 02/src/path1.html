@@ -39,10 +39,17 @@
             localStorage['map'] = JSON.stringify(map);
         }
 
-        function path(map, start, end){
-            let queue = [start];
+        function sleep(t){
+            return new Promise((solve) => {
+                setTimeout(solve, t);
+            });
+        }
 
-            function insert(x, y){
+        async function path(map, start, end){
+            let queue = [start];
+            let container = document.getElementById("container");
+
+            async function insert(x, y){
                 if (x < 0 || x >= 100 || y < 0 || y >= 100){
                     return;
                 }
@@ -53,21 +60,24 @@
 
                 queue.push([x, y]);
                 map[x * 100 + y] = 2;
+
+                await sleep(200);
+                container.children[x * 100 + y].style.backgroundColor = "red";
             }
 
             while(queue.length) {
                 
                 let [x, y] = queue.shift();
-                console.log(`x:${x}, y:${y}`);
+                // console.log(`x:${x}, y:${y}`);
 
                 if (x === end[0] && y === end[1]){
                     return true;
                 }
 
-                insert(x + 1, y);
-                insert(x - 1, y);
-                insert(x, y + 1);
-                insert(x, y - 1);
+                await insert(x + 1, y);
+                await insert(x - 1, y);
+                await insert(x, y + 1);
+                await insert(x, y - 1);
             }
 
             return false;
