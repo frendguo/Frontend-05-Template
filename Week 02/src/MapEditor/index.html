@@ -33,6 +33,7 @@
     <script>
         var map = localStorage['map'] ? JSON.parse(localStorage['map']) : new Array(100 * 100).fill(0);
         var isMouseDown = false;
+        var isClear = false;
 
         function save() {
             localStorage['map'] = JSON.stringify(map);
@@ -44,7 +45,7 @@
             cell.classList.add("cell");
             cell.addEventListener("mousemove", (e)=>{
                 if (isMouseDown) {
-                    if (e.buttons === 2){
+                    if (isClear){
                         cell.style.backgroundColor = "gray";
                     } else {
                         cell.style.backgroundColor = "black";
@@ -62,7 +63,10 @@
             container.appendChild(cell);
         }
 
-        container.onmousedown = () => isMouseDown = true;
+        container.onmousedown = (e) => {
+            isMouseDown = true;
+            isClear = e.buttons === 2;
+        }
         container.onmouseup = () => isMouseDown = false;
         container.oncontextmenu = (e) => e.preventDefault();
     </script>
