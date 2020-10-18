@@ -52,6 +52,7 @@
             }
 
             take() {
+                if (this.data.length < 1) return;
                 let min = this.data[0];
                 let minIndex = 0;
 
@@ -71,12 +72,20 @@
             give(x) {
                 this.data.push(x);
             }
+            
+            get length() {
+                return this.data.length;
+            }
         }
 
         async function findPath(map, start, end){
             let table = Object.create(map);
-            let queue = [start];
+            let queue = new Sorted([start], (x, y) => distance(x) - distance(y));
             let container = document.getElementById("container");
+
+            function distance(point) {
+                return (point[0] - end[0]) ** 2 + (point[1] - end[1]) ** 2;
+            }
 
             async function insert(x, y, parent){
                 if (x < 0 || x >= 100 || y < 0 || y >= 100){
@@ -87,14 +96,14 @@
                     return;
                 }
 
-                queue.push([x, y]);
+                queue.give([x, y]);
                 table[x * 100 + y] = parent;
-
+                await sleep(20);
                 container.children[x * 100 + y].style.backgroundColor = "red";
             }
 
             while(queue.length) {
-                let [x, y] = queue.shift();
+                let [x, y] = queue.take();
                 // console.log(`x:${x}, y:${y}`);
 
                 if (x === end[0] && y === end[1]){
