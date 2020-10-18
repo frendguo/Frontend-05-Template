@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>地图</title>
+    <title>地图寻路</title>
 </head>
 
 <body>
@@ -45,42 +45,59 @@
             });
         }
 
-        async function path(map, start, end){
+        async function findPath(map, start, end){
+            let table = Object.create(map);
             let queue = [start];
             let container = document.getElementById("container");
 
-            async function insert(x, y){
+            async function insert(x, y, parent){
                 if (x < 0 || x >= 100 || y < 0 || y >= 100){
                     return;
                 }
 
-                if (map[x * 100 + y]){
+                if (table[x * 100 + y]){
                     return;
                 }
 
                 queue.push([x, y]);
-                map[x * 100 + y] = 2;
+                table[x * 100 + y] = parent;
 
-                await sleep(200);
                 container.children[x * 100 + y].style.backgroundColor = "red";
             }
 
             while(queue.length) {
-                
                 let [x, y] = queue.shift();
                 // console.log(`x:${x}, y:${y}`);
 
                 if (x === end[0] && y === end[1]){
-                    return true;
+                    // 找到的那个点
+                    container.children[x * 100 + y].style.backgroundColor = "blue";
+                    let path = [];
+
+                    while(x !== start[0] || y !== start[1]) {
+                        // console.log(`current x is ${x}, y is ${y}, start is ${start}`);
+                        path.push([x, y]);
+                        [x, y] = table[x * 100 + y];
+                        await sleep(20);
+                        // 打印路径
+                        container.children[x * 100 + y].style.backgroundColor = "green";
+                    }
+
+                    return path;
                 }
 
-                await insert(x + 1, y);
-                await insert(x - 1, y);
-                await insert(x, y + 1);
-                await insert(x, y - 1);
+                await insert(x + 1, y, [x, y]);
+                await insert(x - 1, y, [x, y]);
+                await insert(x, y + 1, [x, y]);
+                await insert(x, y - 1, [x, y]);
+
+                await insert(x + 1, y + 1, [x, y]);
+                await insert(x + 1, y - 1, [x, y]);
+                await insert(x - 1, y + 1, [x, y]);
+                await insert(x - 1, y - 1, [x, y]);
             }
 
-            return false;
+            return null;
         }
 
         let container = document.getElementById("container");
