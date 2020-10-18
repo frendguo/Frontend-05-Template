@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>地图寻路</title>
+</head>
+
+<body>
+    <style>
+        .cell {
+            width: 6px;
+            height: 6px;
+            display: inline-block;
+            background-color: gray;
+            vertical-align: top;
+
+            border-right: 1px solid white;
+            border-bottom: 1px solid white;
+        }
+
+        #container {
+            width: 701px;
+            line-height: 0;
+        }
+    </style>
+
+    <div id="container"></div>
+
+    <button onclick="save()">save</button>
+
+    <script>
+        var map = localStorage['map'] ? JSON.parse(localStorage['map']) : new Array(100 * 100).fill(0);
+        var isMouseDown = false;
+        var isClear = false;
+
+        function save() {
+            localStorage['map'] = JSON.stringify(map);
+        }
+
+        function sleep(t){
+            return new Promise((solve) => {
+                setTimeout(solve, t);
+            });
+        }
+
+        class Sorted {
+            constructor(data, compare) {
+                this.data = data.slice();
+                this.compare = compare || ((x, y) => x - y);
+            }
+
+            take() {
+                let min = this.data[0];
+                let minIndex = 0;
+
+                for (let i = 1; i < this.data.length; i++) {
+                    if (this.compare(this.data[i], min) < 0) {
+                        min = this.data[i];
+                        minIndex = i;
+                    }
+                }
+
+                this.data[minIndex] = this.data[this.data.length - 1];
+                this.data.pop();
+
+                return min;
+            }
+
+            give(x) {
+                this.data.push(x);
+            }
+        }
+
+        async function findPath(map, start, end){
+            let table = Object.create(map);
+            let queue = [start];
+            let container = document.getElementById("container");
+
+            async function insert(x, y, parent){
+                if (x < 0 || x >= 100 || y < 0 || y >= 100){
+                    return;
+                }
+
+                if (table[x * 100 + y]){
+                    return;
+                }
+
+                queue.push([x, y]);
+                table[x * 100 + y] = parent;
+
+                container.children[x * 100 + y].style.backgroundColor = "red";
+            }
+
+            while(queue.length) {
+                let [x, y] = queue.shift();
+                // console.log(`x:${x}, y:${y}`);
+
+                if (x === end[0] && y === end[1]){
+                    // 找到的那个点
+                    container.children[x * 100 + y].style.backgroundColor = "blue";
+                    let path = [];
+
+                    while(x !== start[0] || y !== start[1]) {
+                        // console.log(`current x is ${x}, y is ${y}, start is ${start}`);
+                        path.push([x, y]);
+                        [x, y] = table[x * 100 + y];
+                        await sleep(20);
+                        // 打印路径
+                        container.children[x * 100 + y].style.backgroundColor = "green";
+                    }
+
+                    return path;
+                }
+
+                await insert(x + 1, y, [x, y]);
+                await insert(x - 1, y, [x, y]);
+                await insert(x, y + 1, [x, y]);
+                await insert(x, y - 1, [x, y]);
+
+                await insert(x + 1, y + 1, [x, y]);
+                await insert(x + 1, y - 1, [x, y]);
+                await insert(x - 1, y + 1, [x, y]);
+                await insert(x - 1, y - 1, [x, y]);
+            }
+
+            return null;
+        }
+
+        let container = document.getElementById("container");
+        for (let i = 0; i < map.length; i++) {
+            let cell = document.createElement("div");
+            cell.classList.add("cell");
+            cell.addEventListener("mousemove", (e)=>{
+                if (isMouseDown) {
+                    if (isClear){
+                        cell.style.backgroundColor = "gray";
+                    } else {
+                        cell.style.backgroundColor = "black";
+                        map[i] = 1;
+                    }
+                }
+            });
+
+            if (map[i] === 0){
+                cell.style.backgroundColor = "gray";
+            } else {
+                cell.style.backgroundColor = "black";
+            }
+
+            container.appendChild(cell);
+        }
+
+        container.onmousedown = (e) => {
+            isMouseDown = true;
+            isClear = e.buttons === 2;
+        }
+        container.onmouseup = () => isMouseDown = false;
+        container.oncontextmenu = (e) => e.preventDefault();
+    </script>
+</body>
+
+</html>
