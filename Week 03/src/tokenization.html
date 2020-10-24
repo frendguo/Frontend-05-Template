@@ -12,23 +12,38 @@
 
         let dictionary = ["number", "+", "-", "*", "/", "whiteSpace", "eof"]
 
-        function tokenize(str) {
-            let result = " "
-            while(result) {
-                result = regString.exec(str);
-                if (!result) break;
+        function* tokenize(str) {
+            let result = null
+            let lastIndex = 0
+            while(true) {
+                lastIndex = regString.lastIndex
+                result = regString.exec(str)
+                // 匹配不上
+                if (!result) break
+                // 有其他字符
+                if (regString.lastIndex - lastIndex > result[0].length) break
+
+                let token = {
+                    type: null,
+                    value: null
+                }
 
                 for (let i = 1; i < result.length; i++) {
                     if (result[i]){
-                        console.log(dictionary[i - 1])
+                        token.type = dictionary[i - 1]
                     }
                 }
+                token.value = result[0]
 
-                console.log(result[0])
+                yield token
             }
+            // 文件结尾(符合规则的字符串结尾)加上 EOF
+            yield {type: "eof"}
         }
 
-        tokenize("2 * 1024 + 222 - 3/5")
+        for (const token of tokenize("2 * 1024 + 3 - 5 / 2")) {
+            console.log(token)
+        }
     </script>
 </body>
 </html>
