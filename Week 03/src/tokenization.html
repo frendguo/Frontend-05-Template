@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tokenization</title>
+</head>
+<body>
+    <script>
+        // token 分为数字、(+、-、*、/)、空格、终结符
+        let regString = /(\d+)|(\+)|(-)|(\*)|(\/)|(\s+)|([\r\n]+)/g
+
+        let dictionary = ["number", "+", "-", "*", "/", "whiteSpace", "eof"]
+
+        function tokenize(str) {
+            let result = " "
+            while(result) {
+                result = regString.exec(str);
+                if (!result) break;
+
+                for (let i = 1; i < result.length; i++) {
+                    if (result[i]){
+                        console.log(dictionary[i - 1])
+                    }
+                }
+
+                console.log(result[0])
+            }
+        }
+
+        tokenize("2 * 1024 + 222 - 3/5")
+    </script>
+</body>
+</html>
+
