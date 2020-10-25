@@ -41,6 +41,52 @@
             yield {type: "eof"}
         }
 
+        function expression(source) {
+            if (source[0].type === "addExpression" && source[1] && source[1].type === "eof") {
+                let node = {
+                    type: "expression",
+                    child: [source.shift(), source.shift()]
+                }
+
+                source.unshift(node)
+                return node
+            }
+
+            addExpression(source)
+            return expression(source)
+        }
+
+        function addExpression(source) {
+            if (source[0].type === "multiExpression") {
+                let node = {
+                    type: "addExpression",
+                    child: [source[0]]
+                }
+                source[0] = node
+                return addExpression(source)
+            } 
+            if (source[0].type === "addExpression" && source[1] && (source[1].type === "+" || source[1].type === "-")){
+                let node = {
+                    type: "addExpression",
+                    operation: source[1].type,
+                    child: []
+                }
+
+                node.child.push(source.shift())
+                node.child.push(source.shift())
+                multiExpression(source)
+                node.child.push(source.shift())
+                source.unshift(node)
+                return addExpression(source)
+            } 
+            if (source[0].type === "addExpression") {
+                return source[0]
+            }
+
+            multiExpression(source)
+            return addExpression(source)
+        }
+
         function multiExpression(source) {
             if (source[0].type === "number") {
                 let node = {
@@ -70,15 +116,19 @@
             return multiExpression(source[0])
         }
 
+        function isMultiExpression(token) {
+            return token.type === "number" || token.type === "multiExpression"
+        }
+
         let source = []
 
-        for (let token of tokenize("4 * 2 / 5")){
-            if (token.type !== "whiteSpace" && token.type !== "eof"){
+        for (let token of tokenize("4 * 2 + 5")){
+            if (token.type !== "whiteSpace"){
                 source.push(token)
             }
         }
 
-        console.log(multiExpression(source))
+        console.log(expression(source))
     </script>
 </body>
 </html>
