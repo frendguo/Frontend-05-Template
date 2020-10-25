@@ -41,9 +41,44 @@
             yield {type: "eof"}
         }
 
-        for (const token of tokenize("2 * 1024 + 3 - 5 / 2")) {
-            console.log(token)
+        function multiExpression(source) {
+            if (source[0].type === "number") {
+                let node = {
+                    type: "multiExpression",
+                    child: [source[0]]
+                }
+                source[0] = node
+                return multiExpression(source)
+            } 
+            if (source[0].type === "multiExpression" && source[1] && (source[1].type === "*" || source[1].type === "/")){
+                let node = {
+                    type: "multiExpression",
+                    operation: source[1].type,
+                    child: []
+                }
+
+                node.child.push(source.shift())
+                node.child.push(source.shift())
+                node.child.push(source.shift())
+                source.unshift(node)
+                return multiExpression(source)
+            } 
+            if (source[0].type === "multiExpression") {
+                return source[0]
+            }
+
+            return multiExpression(source[0])
         }
+
+        let source = []
+
+        for (let token of tokenize("4 * 2 / 5")){
+            if (token.type !== "whiteSpace" && token.type !== "eof"){
+                source.push(token)
+            }
+        }
+
+        console.log(multiExpression(source))
     </script>
 </body>
 </html>
