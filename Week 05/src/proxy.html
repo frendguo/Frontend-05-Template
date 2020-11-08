@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>proxy</title>
+</head>
+<body>
+    <script>
+        let callbacks = [];
+        let object = {
+            a: 100,
+            b: 20,
+        }
+
+        var po = reactive(object);
+
+        effect(()=> {
+            console.log(po.a);
+        })
+
+        function effect(callback) {
+            callbacks.push(callback);
+        }
+
+        function reactive(object) {
+            return new Proxy(object, {
+                set(obj, prop, val) {
+                    obj[prop] = val;
+                    for (let callback of callbacks){
+                        callback();
+                    }
+                    return obj[prop];
+                },
+                get(obj, prop) {
+                    return obj[prop];
+                }
+            })
+        }
+    </script>
+</body>
+</html>
