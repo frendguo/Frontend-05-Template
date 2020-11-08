@@ -6,19 +6,44 @@
     <title>proxy</title>
 </head>
 <body>
+    <input id="r" type="range" min="0" max="255" />
+    <input id="g" type="range" min="0" max="255" />
+    <input id="b" type="range" min="0" max="255" />
+
+    <div id="color" style="width: 50px;height: 50px;">
+    </div>
+
     <script>
         let callbacks = new Map();
         let usedReactivities = [];
+        let reactivities = new Map();
 
         let object = {
-            a: 100,
-            b: 20,
+            r: 1,
+            g: 1,
+            b: 1,
         }
 
         var po = reactive(object);
 
         effect(()=> {
-            console.log(po.a);
+            document.getElementById("r").value = po.r;
+        })
+
+        effect(()=> {
+            document.getElementById("g").value = po.g;
+        })
+
+        effect(()=> {
+            document.getElementById("b").value = po.b;
+        })
+
+        document.getElementById("r").addEventListener("input", event => po.r = event.target.value);
+        document.getElementById("g").addEventListener("input", event => po.g = event.target.value);
+        document.getElementById("b").addEventListener("input", event => po.b = event.target.value);
+
+        effect(()=>{
+            document.getElementById("color").style.backgroundColor = `rgb(${po.r}, ${po.g}, ${po.b})`;
         })
 
         function effect(callback) {
@@ -40,7 +65,11 @@
         }
 
         function reactive(object) {
-            return new Proxy(object, {
+            if (reactivities.has(object)){
+                return reactivities.get(object);
+            }
+
+            let proxy = new Proxy(object, {
                 set(obj, prop, val) {
                     obj[prop] = val;
 
@@ -55,9 +84,17 @@
                 },
                 get(obj, prop) {
                     usedReactivities.push([obj, prop]);
+
+                    if (typeof obj[prop] === "object") {
+                        return reactive(obj[prop]);
+                    }
+
                     return obj[prop];
                 }
-            })
+            });
+
+            reactivities.set(object, proxy);
+            return proxy;
         }
     </script>
 </body>
