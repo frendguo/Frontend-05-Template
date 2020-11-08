@@ -7,7 +7,9 @@
 </head>
 <body>
     <script>
-        let callbacks = [];
+        let callbacks = new Map();
+        let usedReactivities = [];
+
         let object = {
             a: 100,
             b: 20,
@@ -20,19 +22,39 @@
         })
 
         function effect(callback) {
-            callbacks.push(callback);
+            // callbacks.push(callback);
+            usedReactivities = [];
+            callback();
+
+            for (let reactives of usedReactivities) {
+                if (!callbacks.has(reactives[0])) {
+                    callbacks.set(reactives[0], new Map());
+                }
+
+                if (!callbacks.get(reactives[0]).has(reactives[1])){
+                    callbacks.get(reactives[0]).set(reactives[1], []);
+                }
+
+                callbacks.get(reactives[0]).get(reactives[1]).push(callback);
+            }
         }
 
         function reactive(object) {
             return new Proxy(object, {
                 set(obj, prop, val) {
                     obj[prop] = val;
-                    for (let callback of callbacks){
-                        callback();
+
+                    if (callbacks.has(obj) && callbacks.get(obj).has(prop)){
+                        let cbs = callbacks.get(obj).get(prop);
+                        for (let callback of cbs){
+                            callback();
+                        }
                     }
+                    
                     return obj[prop];
                 },
                 get(obj, prop) {
+                    usedReactivities.push([obj, prop]);
                     return obj[prop];
                 }
             })
