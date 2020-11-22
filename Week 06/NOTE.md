@@ -1,206 +1,248 @@
-# JavaScript（二）
+# 重学JS（一）
 
-## 运算符和表达式
+## 语言通识
 
-### 表达式
+### 产生式（BNF）
 
-- Member
+- 用尖括号括起来来表示语法结构名
+- 语法结构
 
-	- a.b
-	- a[b]
-	- foo`string`
-	- super.b
-	- super['b']
-	- new.target
-	- new Foo()
-	- new Foo
+	- 基础结构（终结符）
+	- 复合结构（非终结符）
 
-		- 优先级相对带括号的（new Foo()）较低
+- 现代语言的产生式
 
-- Reference
+### 语言分类
 
-	- Object
-	- key
-	- 使用
+- 非形式语言
 
-		- delete
-		- assign
+	- 中文、英文
 
-- Call
+- 形式语言
 
-	- foo()
-	- super()
-	- foo()['b']
-	- foo().b
-	- foo()`abc`
+	- 具有形式化定义
+	- 分类（乔姆斯基谱系）
 
-- 左手运算和右手运算
+		- 0型-无限制文法
+		- 1型-上下文相关文法
+		- 2型-上下文无关文法
+		- 3型-正则文法
 
-	- Left HandSide：能放到等号左边
-	- Right HandSide
+	- 按用途分类
 
-		- Update
+		- 数据描述语言
 
-- 单目运算符
+			- JSON/XML/SQL/CSS
 
-	- delete a.b
-	- void foo()
-	- typeof a
-	- + a
-	- - a
-	- ~ a
-	- ! a
-	- await a
+		- 编程语言
 
-- 右结合运算符
+			- C/C++/C#
 
-	- **
+	- 按表达方式分类
 
-		- 3 ** 2 ** 3 == 3 ** （2 ** 3）
+		- 声明式语言
 
-- 双目运算符
+			- JSON/HTML
 
-	- 乘除
-	- 加减
+		- 命令式语言
 
-		- 连接两个字符串
-		- 两个数字相加
+			- C/C++/C#
 
-	- 位移运算
-	- 关系运算符
+### 语言中常见的概念
 
-		- instanceof
+- 图灵完备性
 
-- 相等
+	- 表示具有无线存储能力的通用物理机器或编程语言
 
-	- ==
-	- !=
-	- ===
-	- !==
+	  在可计算性理论里，如果一系列操作数据的规则（如指令集、编程语言、细胞自动机）可以用来模拟单带图灵机，那么它是图灵完全的。这个词源于引入图灵机概念的数学家艾伦·图灵。虽然图灵机会受到储存能力的物理限制，图灵完全性通常指 具有无限存储能力的通用物理机器或编程语言。
 
-- 逻辑运算符
+	- 命令式--图灵机
 
-	- 短路原则
-	- 三目运算符
+		- goto
+		- if while
 
-### 类型转换
+	- 声明式--lambda
 
-- 常规转换
-- 拆箱（unboxing）
+		- 递归
 
-	- object -> 基本类型
-	- ToPremitive
-	- toString
-	- valueOf
-	- Symbol.toPrimitive
+	- 图灵机
 
-- 装箱（boxing）
+		- 又称确定型图灵机，是英国数学家艾伦·图灵于 1936 年提出的一种将人的计算行为抽象掉的数学逻辑机，其更抽象的意义为一种计算模型，可以看作等价于 任何有限逻辑数学过程的终极强大逻辑机器
 
-	- 包装类
+- 静态语言/动态语言
 
-## 语句
+	- 静态语言（强类型语言）
 
-### 语法
+		- 静态语言是在编译时变量的数据类型即可确定的语言，多数静态类型语言要求在使用变量之前必须声明数据类型
+		- 由于类型的强制声明，使得IDE有很强的代码感知能力
+		- 由于静态语言相对比较封闭，使得第三方开发包对代码的侵害性可以降到最低
+		- C、C++、C#
 
-- 简单语句
+	- 动态语言（弱类型语言）
 
-	- 表达式语句（ExpressionStatement）
-	- 空语句（EmptyStatement）
-	- Debugger 语句（DebuggerStatement）
+		- 动态语言是在运行时确定数据类型的语言。变量使用之前不需要类型声明，通常变量的类型是被赋值的那个值的类型
+		- 思维不受束缚，可以任意发挥，把更多的精力放在产品本身上
+		- PHP、JavaScript
 
-		- 触发一个断点，用来调试用（debugger;）
+- 强弱类型语言
 
-	- ThrowStatement
-	- ContinueStatement
-	- BreakStatement
-	- ReturnStatement
+	- 强类型定义语言
 
-- 复合语句
+		- 强制数据类型定义的语言。也就是说，一旦一个变量被指定了某个数据类型，如果不经过强制转换，那么它就永远是这个数据类型了
 
-	- BlockStatement
+	- 弱类型定义语言
 
-		- 使用花括号包起来，可以形成一个作用域
+		- 数据类型可以被忽略的语言
 
-	- IfStatement
-	- SwitchStatement
+### 一般命令式编程语言
 
-		- 建议使用 if 来代替 Switch
+- 结构
 
-	- IterationStatement
+	- Atom - Expression - Statement - Structure - Program
 
-		- 包括一大堆循环语句（for...in, for...of， while）
+- 语法 -- 语义 --> 运行时
 
-	- WithStatement
+## JavaScript
 
-		- 不建议使用
+### JS 类型
 
-	- LabelledStatement
-	- TryStatement
+- Nmber
 
-		- 不能省略花括号
+	- Double Float: 双精度浮点数
 
-- 声明
+		- IEEE 754 标准
 
-	- 类型
+			- 符号位（1位）
+			- 指数位（11位）
+			- 精度位（52位）
 
-		- 函数声明
+	- 语法
 
-	- 预处理
+		- 十进制
 
-		- 所有的声明都具有预处理机制
+			- 0.
+			- .2
+			- 1e3
 
-	- 作用域
+		- 二进制
 
-### 运行时
+			- 0b111
 
-- Completion Record（语句完成的记录）
+		- 八进制
 
-	- [[type]]
+			- 0o777
 
-		- normal，break，continue，return，throw
+		- 十六进制
 
-	- [[value]]
+			- 0xFFF
 
-		- 基本类型
+- String
 
-	- [[target]]
+	- 字符
 
-		- lable
+		- Code Point（码点）
+		- Encoding（编码）
 
-## 结构化
+			- UTF
 
-### JS 执行粒度
+				- UTF8
+				- UTF16
 
-- 宏任务
+		- 字符集
 
-	- 传给 JavaScript 引擎的任务
+			- ASCII
+			- Unicode
+			- UCS
 
-- 微任务
+				- 0000~FFFF
 
-	- 在 JavaScript 中执行的任务
-	- Promise
+			- GB（字符集和编码方式）
 
-- 函数调用
+				- GB2312
+				- GBK(GB13000)
+				- GB18030
 
-	- 函数调用
-	- 执行上下文（Execution Context）
-	- 闭包
+			- ISO-8859
+			- BIG5
 
-		- 每个函数都会生成一个闭包
-		- 包含
+	- 语法
 
-			- 环境部分：Environment Record
-			- 代码部分：Code
+		- 单引号
+		- 双引号
+		- 模板字符串
+
+			- `v:${v}`
+			- 语法结构，非词法结构
+
+- Boolean
+- Object
+
+	- 对象（Object）
+
+		- 描述对象： 类
+
+			- 归类
+			- 分类
+
+		- 原型（Prototype）
+
+			- 任何对象仅仅需要描述它自己与原型的区别
+
+		- 设计时，需要考虑，“行为改变状态”的原则
+
+	- JavaScript 的对象
 
 		- 
 
-	- Realm
+			- 原型
 
-		- 在 JS 中，函数表达式和对象直接量会创建对象
-		- 使用 .  做隐式转换也会创建对象
-		- 这些对象是具有原型的，如果我们没有 Realm，就不知道它们的原型是什么。
+				- 原型链
 
-- 语句/声明
-- 表达式
-- 直接量/变量/this
+			- 属性
+
+				- Symbol
+
+					- key--val
+					- 属性访问控制
+
+				- 数据属性
+
+					- 
+
+				- 访问器属性
+
+					- 
+
+		- API
+
+			- {} . [] Object.defineProperty
+
+				- 基本的对象机制
+
+			- Object.create / Object.setPrototypeOf / Object.getPrototypeOf
+
+				- 基于原型的对象API
+
+			- new / class / extends
+
+				- 基于分类的对象API
+
+			- new / function / prototype
+
+				- 历史包袱，不建议使用
+
+		- Function Object
+
+			- 带 [[call]] 方法的对象
+
+		- 特殊对象
+
+			- Array Object
+			- Host Object
+
+- Null
+- Undefined
+- Symbol
+
+	- 作为 object 的属性名，用来私有化变量
 
