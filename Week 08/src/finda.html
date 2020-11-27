@@ -1,0 +1,14 @@
+<script>
+    function findChar(str, char) {
+        if (!str || str.length < 1) return false;
+
+        for (let c of str) {
+            if (c === char){
+                return true;
+            } 
+        }
+        return false;
+    }
+
+    findChar("i am frendguo", 'a');
+</script>
