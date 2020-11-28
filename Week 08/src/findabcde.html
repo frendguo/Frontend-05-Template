@@ -1,0 +1,21 @@
+<script>
+    /*
+        方法一：暴力法
+    */
+    function findStr(originStr, desStr) {
+        for (let i = 0; i < originStr.length; i++) {
+            let j = 0;
+            for (j = 0; j < desStr.length; j++) {
+                if (desStr[j] !== originStr[i + j]) {
+                    break;
+                }
+            }
+
+            if (j === desStr.length) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+</script>
